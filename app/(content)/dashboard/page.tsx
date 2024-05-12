@@ -2,21 +2,15 @@
 
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
-import { Button, Stack, Typography } from "@mui/material";
-import {
-  DownloadOutlined,
-  PlusOneOutlined,
-  UploadFile,
-} from "@mui/icons-material";
-import { Product, ProductsTable } from "@/components/Product/products-table";
-import { ProductFilters } from "@/components/Product/products-filters";
-import products from "@/data/products/data";
+import { Stack } from "@mui/material";
+
+import { ProductsTable } from "@/components/Product/products-table";
+import { TagsInput } from "react-tag-input-component";
+import { useState } from "react";
 
 const Dashboard = () => {
-  const page = 0;
-  const rowsPerPage = 5;
+  const [selected, setSelected] = useState(["Date Night"]);
 
-  const paginatedProducts = applyPagination(products, page, rowsPerPage);
   return (
     <div className="mt-5 flex h-[500] gap-2">
       <div className="w-1/6 flex-none ">
@@ -40,7 +34,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="h-3/4 w-5/6 flex-auto">
+      <div className="h-5/6 w-5/6 flex-auto">
         <div className="rounded-lg bg-white p-2">
           <Stack spacing={3}>
             <Stack direction="row" spacing={3}>
@@ -50,13 +44,7 @@ const Dashboard = () => {
                 </h1>
               </Stack>
             </Stack>
-            <ProductFilters />
-            <ProductsTable
-              count={paginatedProducts.length}
-              page={page}
-              rows={paginatedProducts}
-              rowsPerPage={rowsPerPage}
-            />
+            <ProductsTable />
           </Stack>
         </div>
       </div>
@@ -73,10 +61,23 @@ const Dashboard = () => {
             />
           ))}
         </div>
-        <div className="m-2 flex w-full place-content-center">
-          <button className="mt-2 h-11 w-1/2 place-content-center rounded-lg bg-blue-700 text-white hover:bg-blue-400">
-            Save Moodboard
-          </button>
+        <div className="m-2 w-full place-content-center">
+          <div className="mt-4">
+            <TagsInput
+              value={selected}
+              onChange={setSelected}
+              name="tags"
+              placeHolder="Tag the moodboard"
+            />
+            <em className="text-center italic text-xs">
+              press enter or comma to add new tag
+            </em>
+          </div>
+          <div className="w-full mt-2">
+            <button className="mt-2 h-11 w-full place-content-center rounded-lg bg-blue-700 text-white hover:bg-blue-400">
+              Save Moodboard
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -84,11 +85,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-function applyPagination(
-  rows: Product[],
-  page: number,
-  rowsPerPage: number,
-): Product[] {
-  return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-}

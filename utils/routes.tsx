@@ -6,7 +6,7 @@ const routes = [
     name: "Dashboard",
     layout: "/dashboard",
     path: "/",
-    icon: <Home color="primary" className="h-6 w-6 " />,
+    icon: <Home className="h-6 w-6 " />,
   },
 ];
 export default routes;

@@ -1,140 +1,54 @@
 "use client";
-
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import Checkbox from "@mui/material/Checkbox";
-import Divider from "@mui/material/Divider";
-import Stack from "@mui/material/Stack";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
-import dayjs from "dayjs";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+import products from "@/data/products/data";
 
-import { useSelection } from "@/hooks/use-selection";
+const columns: GridColDef[] = [
+  { field: "product", headerName: "Product", width: 150 },
+  {
+    field: "description",
+    headerName: "Description",
+    sortable: false,
+    flex: 1,
+  },
+  {
+    field: "quantity",
+    headerName: "Inventory",
+    type: "number",
+    width: 100,
+  },
+  {
+    field: "category",
+    headerName: "Category",
+    width: 100,
+  },
+];
 
-function noop(): void {
-  // do nothing
-}
+const rows = products;
 
-export interface Product {
-  id: string;
-  avatar: string;
-  name: string;
-  email: string;
-  address: { city: string; state: string; country: string; street: string };
-  phone: string;
-  createdAt: Date;
-}
-
-interface ProductsTableProps {
-  count?: number;
-  page?: number;
-  rows?: Product[];
-  rowsPerPage?: number;
-}
-
-export function ProductsTable({
-  count = 0,
-  rows = [],
-  page = 0,
-  rowsPerPage = 0,
-}: ProductsTableProps): React.JSX.Element {
-  const rowIds = React.useMemo(() => {
-    return rows.map((product) => product.id);
-  }, [rows]);
-
-  const { selectAll, deselectAll, selectOne, deselectOne, selected } =
-    useSelection(rowIds);
-
-  const selectedSome =
-    (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
-  const selectedAll = rows.length > 0 && selected?.size === rows.length;
-
+export function ProductsTable() {
   return (
-    <Card>
-      <Box sx={{ overflowX: "auto" }}>
-        <Table sx={{ minWidth: "800px" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={selectedAll}
-                  indeterminate={selectedSome}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      selectAll();
-                    } else {
-                      deselectAll();
-                    }
-                  }}
-                />
-              </TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Signed Up</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => {
-              const isSelected = selected?.has(row.id);
-
-              return (
-                <TableRow hover key={row.id} selected={isSelected}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          selectOne(row.id);
-                        } else {
-                          deselectOne(row.id);
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Stack
-                      sx={{ alignItems: "center" }}
-                      direction="row"
-                      spacing={2}
-                    >
-                      <Avatar src={row.avatar} />
-                      <Typography variant="subtitle2">{row.name}</Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>
-                    {row.address.city}, {row.address.state},{" "}
-                    {row.address.country}
-                  </TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>
-                    {dayjs(row.createdAt).format("MMM D, YYYY")}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </Box>
-      <Divider />
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={noop}
-        onRowsPerPageChange={noop}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+    <div style={{ height: "800px", width: "100%" }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 50 },
+          },
+        }}
+        pageSizeOptions={[50, 100, 200]}
+        checkboxSelection
+        disableColumnFilter
+        disableColumnSelector
+        disableDensitySelector
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
       />
-    </Card>
+    </div>
   );
 }
