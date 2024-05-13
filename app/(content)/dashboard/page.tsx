@@ -1,15 +1,38 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
 import { Stack } from "@mui/material";
-
 import { ProductsTable } from "@/components/Product/products-table";
 import { TagsInput } from "react-tag-input-component";
-import { useState } from "react";
+import StoreItem from "@/components/store/StoreItem";
+import { SessionData } from "@/interface";
 
 const Dashboard = () => {
   const [selected, setSelected] = useState(["Date Night"]);
+  const [stores, setStores] = useState<SessionData[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/store");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        console.log("Data fetched:", data);
+        setStores(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleItemClick = (store: SessionData) => {
+    console.log(`Store item clicked ${store.shop} ${store.accessToken}`);
+  };
 
   return (
     <div className="mt-5 flex h-[500] gap-2">
@@ -20,17 +43,13 @@ const Dashboard = () => {
           </div>
 
           <div className="overflow-y-scroll">
-            <div className="mx-1 my-2 rounded-md border border-gray-200 hover:cursor-pointer">
-              <p className="p-2">Bellisima</p>
-            </div>
-
-            <div className="m-1 rounded-md border border-gray-200">
-              <p className="p-2">Woven</p>
-            </div>
-
-            <div className="m-1 rounded-md border border-gray-200">
-              <p className="p-2">Lewk&apos;s Store</p>
-            </div>
+            {stores.map((store, index) => (
+              <StoreItem
+                key={index}
+                name={store.shop.replace(/-|\.myshopify\.com/g, "")}
+                onClick={() => handleItemClick(store)}
+              />
+            ))}
           </div>
         </div>
       </div>
