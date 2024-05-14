@@ -13,7 +13,7 @@ export const GET = async (request: Request) => {
       throw error;
     }
     const storeData = data as SessionData[];
-    return Response.json(data);
+    return Response.json(storeData);
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Unable to get profile." });

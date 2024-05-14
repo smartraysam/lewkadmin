@@ -1,17 +1,58 @@
+import { Product } from "@/interface";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import Shopify from "shopify-api-node";
+
+let params = { limit: 50, page_info: "" };
 
 export async function GET(request: NextRequest) {
   try {
     const shop = request.nextUrl.searchParams.get("shop");
-    const accesstoken = request.nextUrl.searchParams.get("accesstoken");
-    if (!shop || !accesstoken) {
-      return NextResponse.json(
-        { error: `shop and accesstoken are required.` },
-        { status: 400 },
-      );
+    if (!shop) {
+      return NextResponse.json({ error: `shop is required.` }, { status: 400 });
     }
-    const results = {};
-    return NextResponse.json(results, { status: 201 });
+
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const { data, error } = await supabase
+      .from("Session")
+      .select("accessToken")
+      .eq("shop", shop);
+    if (error) {
+      throw error;
+    }
+
+    const accesstoken = data[0].accessToken;
+
+    const shopify = new Shopify({
+      shopName: shop,
+      accessToken: accesstoken,
+    });
+
+    const query = request.nextUrl.searchParams.get("query");
+    if (query === "count") {
+      const results = await shopify.product.count();
+      return NextResponse.json({ results }, { status: 200 });
+    } else {
+      const pageinfo = request.nextUrl.searchParams.get("pageinfo");
+      if (pageinfo) {
+        params.page_info = pageinfo;
+      }
+      const results = await shopify.product.list(params);
+      const products = results.map((product) => {
+        return {
+          id: product.id,
+          product: product.title,
+          description: product.body_html,
+          quantity: product.variants[0].inventory_quantity,
+          category: product.product_type,
+          featureImage: product.image.src ?? "",
+        };
+      });
+      const nextPage = results.nextPageParameters;
+      return NextResponse.json({ nextPage, products }, { status: 200 });
+    }
   } catch (error: any) {
     console.error(error);
     return NextResponse.json(
@@ -20,99 +61,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-interface PageInfo {
-  hasNextPage: boolean;
-  endCursor: string | null;
-  hasPreviousPage: boolean;
-  startCursor: string | null;
-}
-
-export const getAllProducts = async (
-  cursor: string | null = null,
-  allProducts: any = [],
-  admin: any,
-  shop: string,
-): Promise<any> => {
-  const response = await admin.graphql(
-    `
-      #graphql
-      query getProduct {
-        products(first: 250, after: ${cursor ? `"${cursor}"` : null}, query: "inventory_total>0") {
-          pageInfo {
-            endCursor
-            hasNextPage
-            hasPreviousPage
-            startCursor
-          }
-          edges {
-            node {
-              id
-              title
-              description
-              handle
-              tags
-              vendor
-              status
-              productType
-              featuredImage {
-                url
-              }   
-            }
-          }
-        }
-      }
-    `,
-  );
-
-  const { data } = await response.json();
-  const { edges, pageInfo }: { edges: any; pageInfo: PageInfo } = data.products;
-  edges.forEach(async (edge: any) => {
-    const variants = edge.node.variants.edges;
-    const arrayVariants: any[] = [];
-    variants.forEach((variant: any) => {
-      const node = variant.node;
-      const [color, size] = node.title.split(" / ");
-      arrayVariants.push({
-        id: node.id,
-        color: color,
-        size: size,
-        price: node.price,
-        image: node?.image === null ? "" : node.image.url,
-        variant_details: `Colour- ${color},Size- ${size}`,
-      });
-    });
-    const product = {
-      id: edge.node.id,
-      title: edge.node.title,
-      description: edge.node.description,
-      tags: edge.node.tags.toString(),
-      priceRange: {
-        maxVariantPrice: {
-          amount: edge.node.priceRange.maxVariantPrice.amount,
-        },
-      },
-      featureImage: {
-        url:
-          edge.node.featuredImage === null ? "" : edge.node.featuredImage.url,
-      },
-      published: edge.node.status == "active" ? true : false,
-      vendor: edge.node.vendor,
-      handle: edge.node.handle,
-      productType: edge.node.productType,
-      variants: arrayVariants,
-    };
-    allProducts.push(product);
-  });
-
-  if (pageInfo.hasNextPage === true && pageInfo.endCursor !== null) {
-    return await getAllProducts(
-      pageInfo.endCursor,
-      [...allProducts],
-      admin,
-      shop,
-    );
-  } else {
-    return true;
-  }
-};
