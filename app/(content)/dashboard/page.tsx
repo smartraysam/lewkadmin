@@ -1,53 +1,31 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { Key, use, useEffect, useState } from "react";
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
-import { Stack } from "@mui/material";
+import { Stack, TextField } from "@mui/material";
 import { ProductsTable } from "@/components/Product/products-table";
 import { TagsInput } from "react-tag-input-component";
 import StoreItem from "@/components/store/StoreItem";
 import { SessionData } from "@/interface";
+import useSWR from "swr";
 
 const Dashboard = () => {
   const [tags, setTags] = useState<string[]>(["Date Night"]);
-  const [stores, setStores] = useState<SessionData[]>([]);
   const [shop, setShop] = useState<string>("");
-  const [productCnt, setProductCnt] = useState<number>(0);
   const [images, setImages] = useState<string[]>(moodboard[0].data);
 
-  useEffect(() => {
-    const fetchStores = async () => {
-      try {
-        const response = await fetch("/api/store");
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data = await response.json();
-        setStores(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-    fetchStores();
-  }, []);
-
+  const { data: stores, error: storesError } = useSWR("/api/store", fetcher);
+  const { data: productCnt, error: productCntError } = useSWR(
+    shop ? `/api/products?query=count&shop=${shop}` : null,
+    fetcher,
+  );
   const handleItemClick = (store: SessionData) => {
-    setShop(store.shop);
-    fetchProdCnt(store.shop);
-  };
-
-  const fetchProdCnt = async (shop: string) => {
-    try {
-      const response = await fetch(`/api/products?query=count&shop=${shop}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      setProductCnt(data.results);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    if (shop === store.shop) {
+      return;
     }
+    setShop(store.shop);
   };
   const handleImageValueChange = (value: string) => {
     if (images.length === 4) {
@@ -68,14 +46,16 @@ const Dashboard = () => {
           </div>
 
           <div className="overflow-y-scroll">
-            {stores.map((store, index) => (
-              <StoreItem
-                key={index}
-                name={store.shop.replace(/-|\.myshopify\.com/g, "")}
-                onClick={() => handleItemClick(store)}
-                selected={shop === store.shop}
-              />
-            ))}
+            {stores &&
+              stores.length > 0 &&
+              stores.map((store: SessionData, index: number) => (
+                <StoreItem
+                  key={index}
+                  name={store.shop.replace(/-|\.myshopify\.com/g, "")}
+                  onClick={() => handleItemClick(store)}
+                  selected={shop === store.shop}
+                />
+              ))}
           </div>
         </div>
       </div>
@@ -111,6 +91,15 @@ const Dashboard = () => {
           ))}
         </div>
         <div className="m-2 w-full place-content-center">
+          <div className="mt-4">
+            <label htmlFor="name">Moodboard Label</label>
+            <TextField
+              id="name"
+              name="moodboard_name"
+              className="w-full h-12 border border-gray-400 rounded-lg p-2"
+              variant="outlined"
+            />
+          </div>
           <div className="mt-4">
             <TagsInput
               value={tags}

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const query = request.nextUrl.searchParams.get("query");
     if (query === "count") {
       const results = await shopify.product.count();
-      return NextResponse.json({ results }, { status: 200 });
+      return NextResponse.json(results, { status: 200 });
     } else {
       const pageinfo = request.nextUrl.searchParams.get("pageinfo");
       if (pageinfo) {
@@ -41,13 +41,15 @@ export async function GET(request: NextRequest) {
       }
       const results = await shopify.product.list(params);
       const products = results.map((product) => {
+        const featureImage =
+          product.image && product.image.src ? product.image.src : "";
         return {
           id: product.id,
           product: product.title,
           description: product.body_html,
           quantity: product.variants[0].inventory_quantity,
           category: product.product_type,
-          featureImage: product.image.src ?? "",
+          featureImage: featureImage,
         };
       });
       const nextPage = results.nextPageParameters;

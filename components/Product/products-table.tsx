@@ -60,6 +60,7 @@ export function ProductsTable({
       return;
     }
     setIsLoading(true);
+    setProducts([]);
     fetchData();
   }, [shop]);
 
@@ -98,7 +99,7 @@ export function ProductsTable({
         columns={columns}
         pagination
         paginationMode="server"
-        rowCount={count}
+        rowCount={count ?? 50}
         onPaginationModelChange={(newPaginationModel) => {
           if (newPaginationModel.page < prev) {
             setPageInfo("");
