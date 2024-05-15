@@ -5,8 +5,8 @@ export const isWindowAvailable = () => typeof window !== "undefined";
 export const findCurrentRoute = (
   routes: IRoute[],
   pathname: string,
-): IRoute => {
-  if (!isWindowAvailable()) return null;
+): IRoute | undefined => {
+  if (!isWindowAvailable()) return;
   for (let route of routes) {
     if (!!route.items) {
       const found = findCurrentRoute(route.items, pathname);
