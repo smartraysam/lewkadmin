@@ -6,9 +6,7 @@ export const GET = async (request: Request) => {
   const cookieStore = cookies();
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
   try {
-    const { data, error } = await supabase
-      .from("Session")
-      .select("shop, accessToken");
+    const { data, error } = await supabase.from("Session").select("shop");
     if (error) {
       throw error;
     }

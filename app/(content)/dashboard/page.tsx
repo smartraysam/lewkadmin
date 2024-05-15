@@ -1,5 +1,5 @@
 "use client";
-import { Key, use, useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
 import { Stack, TextField } from "@mui/material";
@@ -17,10 +17,6 @@ const Dashboard = () => {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
   const { data: stores, error: storesError } = useSWR("/api/store", fetcher);
-  const { data: productCnt, error: productCntError } = useSWR(
-    shop ? `/api/products?query=count&shop=${shop}` : null,
-    fetcher,
-  );
   const handleItemClick = (store: SessionData) => {
     if (shop === store.shop) {
       return;
@@ -65,15 +61,11 @@ const Dashboard = () => {
             <Stack direction="row" spacing={3}>
               <Stack spacing={1} sx={{ flex: "1 1 auto" }}>
                 <h1 className="text-[40] font-bold text-black m-4">
-                  Available Products on {shop}
+                  Available Products {shop ? `on ${shop}` : ""}
                 </h1>
               </Stack>
             </Stack>
-            <ProductsTable
-              shop={shop}
-              count={productCnt}
-              onValueChange={handleImageValueChange}
-            />
+            <ProductsTable shop={shop} onValueChange={handleImageValueChange} />
           </Stack>
         </div>
       </div>

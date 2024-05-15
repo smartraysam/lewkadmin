@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Shopify from "shopify-api-node";
 
-let params = { limit: 50, page_info: "" };
+let params = { limit: 100, page_info: "" };
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,32 +29,24 @@ export async function GET(request: NextRequest) {
       shopName: shop,
       accessToken: accesstoken,
     });
-
-    const query = request.nextUrl.searchParams.get("query");
-    if (query === "count") {
-      const results = await shopify.product.count();
-      return NextResponse.json(results, { status: 200 });
-    } else {
-      const pageinfo = request.nextUrl.searchParams.get("pageinfo");
-      if (pageinfo) {
-        params.page_info = pageinfo;
-      }
-      const results = await shopify.product.list(params);
-      const products = results.map((product) => {
-        const featureImage =
-          product.image && product.image.src ? product.image.src : "";
-        return {
-          id: product.id,
-          product: product.title,
-          description: product.body_html,
-          quantity: product.variants[0].inventory_quantity,
-          category: product.product_type,
-          featureImage: featureImage,
-        };
-      });
-      const nextPage = results.nextPageParameters;
-      return NextResponse.json({ nextPage, products }, { status: 200 });
-    }
+    const pageinfo = request.nextUrl.searchParams.get("pageinfo") ?? "";
+    params.page_info = pageinfo;
+    const results = await shopify.product.list(params);
+    const products = results.map((product) => {
+      const featureImage =
+        product.image && product.image.src ? product.image.src : "";
+      return {
+        id: product.id,
+        product: product.title,
+        description: product.body_html,
+        quantity: product.variants[0].inventory_quantity,
+        category: product.product_type,
+        featureImage: featureImage,
+      };
+    });
+    const nextPage = results.nextPageParameters;
+    console.log(nextPage);
+    return NextResponse.json({ nextPage, products }, { status: 200 });
   } catch (error: any) {
     console.error(error);
     return NextResponse.json(

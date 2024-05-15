@@ -1,6 +1,5 @@
 export interface SessionData {
   shop: string;
-  accessToken: string;
 }
 
 export interface Product {
