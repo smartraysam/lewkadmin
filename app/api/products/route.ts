@@ -1,3 +1,4 @@
+import { image, variant } from "./../../../interface/index";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -32,6 +33,25 @@ export async function GET(request: NextRequest) {
     params.page_info = pageinfo;
     const results = await shopify.product.list(params);
     const products = results.map((product) => {
+      const variants = product.variants.map((variant) => {
+        return {
+          id: variant.id,
+          title: variant.title,
+          price: variant.price,
+          option1: variant.option1,
+          option2: variant.option2,
+          option3: variant.option3,
+          inventory_quantity: variant.inventory_quantity,
+          old_inventory_quantity: variant.old_inventory_quantity,
+          image_id: variant.image_id,
+        };
+      });
+      const images = product.images.map((image) => {
+        return {
+          src: image ? image.src : "",
+          variant_ids: image.variant_ids,
+        };
+      });
       const featureImage =
         product.image && product.image.src ? product.image.src : "";
       return {
@@ -41,10 +61,12 @@ export async function GET(request: NextRequest) {
         quantity: product.variants[0].inventory_quantity,
         category: product.product_type,
         featureImage: featureImage,
+        tags: product.tags,
+        variants: variants,
+        images: images,
       };
     });
     const nextPage = results.nextPageParameters;
-    console.log(nextPage);
     return NextResponse.json({ nextPage, products }, { status: 200 });
   } catch (error: any) {
     console.error(error);
