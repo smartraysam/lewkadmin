@@ -2,17 +2,40 @@
 import { useState } from "react";
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
-import { Stack, TextField } from "@mui/material";
+import { Alert, Stack, TextField } from "@mui/material";
 import { ProductsTable } from "@/components/Product/products-table";
 import { TagsInput } from "react-tag-input-component";
 import StoreItem from "@/components/store/StoreItem";
-import { SessionData } from "@/interface";
+import { FormInterface, Product, SessionData } from "@/interface";
 import useSWR from "swr";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { z } from "zod";
+import { Form, Formik } from "formik";
+import { saveMoodBoard } from "@/app/actions/moodboard";
 
+const boardSchema = z.object({
+  tags: z
+    .string()
+    .array()
+    .nonempty("Tag is required")
+    .min(1, "Minimum of 1 tags"),
+  name: z.string().min(3, "Name must be at least 6 characters"),
+});
+const initialState = {
+  tags: ["Party"],
+  name: "",
+  product_items: [],
+  shop: "",
+};
 const Dashboard = () => {
-  const [tags, setTags] = useState<string[]>(["Date Night"]);
+  const [tags, setTags] = useState<string[]>(["Party"]);
   const [shop, setShop] = useState<string>("");
   const [images, setImages] = useState<string[]>(moodboard[0].data);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [response, setResponse] = useState<any>({
+    status: "",
+    message: "",
+  });
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -23,14 +46,54 @@ const Dashboard = () => {
     }
     setShop(store.shop);
   };
-  const handleImageValueChange = (value: string) => {
+  const handleImageValueChange = (value: Product) => {
     if (images.length === 4) {
       setImages([]);
     }
-    if (images.includes(value)) {
+    if (images.includes(value.featureImage)) {
       return;
     }
-    setImages((prev) => [...prev, value]);
+    setProducts((prev) => [...prev, value]);
+    setImages((prev) => [...prev, value.featureImage]);
+  };
+
+  const handleSubmit = async (values: FormInterface, { resetForm }: any) => {
+    if (!shop || products.length === 0) {
+      setResponse({ status: "error", message: "Select Products" });
+      return;
+    }
+    const formData = {
+      tags: tags,
+      name: values.name,
+      product_items: products,
+      shop: shop,
+    };
+    console.log(formData);
+    try {
+      const data = await saveMoodBoard(formData);
+      setImages([]);
+      setProducts([]);
+      setTags(["Party"]);
+      resetForm({
+        tags: [],
+        name: "",
+        product_items: [],
+        shop: "",
+      });
+      if (data.response === "error") {
+        setResponse({ status: "error", message: "Error saving moodboard." });
+      } else {
+        setResponse({
+          status: "success",
+          message: "Moodboard saved successfully.",
+        });
+        setTimeout(() => {
+          setResponse({ status: "", message: "" });
+        }, 3000);
+      }
+    } catch (error) {
+      setResponse({ status: "error", message: "Error saving moodboard." });
+    }
   };
 
   return (
@@ -65,7 +128,11 @@ const Dashboard = () => {
                 </h1>
               </Stack>
             </Stack>
-            <ProductsTable shop={shop} onValueChange={handleImageValueChange} />
+            <ProductsTable
+              shop={shop}
+              onValueChange={handleImageValueChange}
+              selectedData={products}
+            />
           </Stack>
         </div>
       </div>
@@ -83,31 +150,68 @@ const Dashboard = () => {
           ))}
         </div>
         <div className="m-2 w-full place-content-center">
-          <div className="mt-4">
-            <label htmlFor="name">Moodboard Label</label>
-            <TextField
-              id="name"
-              name="moodboard_name"
-              className="w-full h-12 border border-gray-400 rounded-lg p-2"
-              variant="outlined"
-            />
-          </div>
-          <div className="mt-4">
-            <TagsInput
-              value={tags}
-              onChange={setTags}
-              name="tags"
-              placeHolder="Tag the moodboard"
-            />
-            <em className="text-center italic text-xs">
-              press enter or comma to add new tag
-            </em>
-          </div>
-          <div className="w-full mt-2">
-            <button className="mt-2 h-11 w-full place-content-center rounded-lg bg-blue-700 text-white hover:bg-blue-400">
-              Save Moodboard
-            </button>
-          </div>
+          {response.status && (
+            <Alert severity={response.status}>{response.message}.</Alert>
+          )}
+          <Formik
+            initialValues={initialState}
+            onSubmit={handleSubmit}
+            validationSchema={toFormikValidationSchema(boardSchema)}
+            validateOnBlur
+            isInitialValid={false}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              errors,
+              values,
+              isSubmitting,
+              touched,
+              isValid,
+            }) => (
+              <Form>
+                <div className="mt-4">
+                  <label htmlFor="moodboard_name">Moodboard Label</label>
+                  <TextField
+                    id="name"
+                    name="name"
+                    className="w-full h-12 border border-gray-400 rounded-lg p-2"
+                    variant="outlined"
+                    onChange={handleChange("name")}
+                    onBlur={handleBlur("name")}
+                    value={values?.name}
+                  />
+                  {touched.name && errors.name && (
+                    <p className="text-xs text-red-500">{errors.name}</p>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <TagsInput
+                    onChange={setTags}
+                    name="tags"
+                    onBlur={handleBlur("tags")}
+                    value={tags}
+                    placeHolder="Tag the moodboard"
+                  />
+                  <em className="text-center italic text-xs">
+                    press enter or comma to add new tag
+                  </em>
+                  {touched.tags && errors.tags && (
+                    <p className="text-xs text-red-500">{errors.tags}</p>
+                  )}
+                </div>
+                <div className="w-full mt-2">
+                  <button
+                    type="submit"
+                    disabled={!isValid || isSubmitting}
+                    className={`mt-2 h-11 w-full place-content-center rounded-lg text-white  ${!isValid || isSubmitting ? "cursor-not-allowed bg-gray-400" : " bg-blue-700 hover:bg-blue-400"}`}
+                  >
+                    {isSubmitting ? "Please wait..." : " Save Moodboard "}
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </div>
       </div>
     </div>

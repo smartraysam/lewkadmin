@@ -1,7 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import * as React from "react";
-import { DataGrid, GridColDef, GridRowId, GridToolbar } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRowId,
+  GridRowSelectionModel,
+  GridToolbar,
+} from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Product } from "@/interface";
 
@@ -35,37 +41,48 @@ const columns: GridColDef[] = [
 
 interface Props {
   shop?: string;
-  onValueChange: (value: string) => void;
+  onValueChange: (value: Product) => void;
+  selectedData: Product[];
 }
 
-export function ProductsTable({ shop, onValueChange }: Props): JSX.Element {
+export function ProductsTable({
+  shop,
+  onValueChange,
+  selectedData,
+}: Props): JSX.Element {
   const [products, setProducts] = useState<Product[]>([]);
   const [pageInfo, setPageInfo] = useState<string | null>("");
   const [prev, setPrev] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [selected, setSelected] = useState<GridRowId[]>([]);
+  const [rowSelectionModel, setRowSelectionModel] =
+    useState<GridRowSelectionModel>([]);
   let store = "";
   useEffect(() => {
-    if (!shop) {
-      return;
+    if (shop) {
+      setIsLoading(true);
+      setProducts([]);
+      setPageInfo("");
+      store = shop;
+      fetchData(store, "");
     }
-    setIsLoading(true);
-    setProducts([]);
-    setPageInfo("");
-    store = shop;
-    fetchData(store, "");
   }, [shop]);
 
   useEffect(() => {
-    if (selected.length > 0) {
-      for (const id of selected) {
+    if (selectedData.length == 0) {
+      setRowSelectionModel([]);
+    }
+  }, [selectedData]);
+
+  useEffect(() => {
+    if (rowSelectionModel.length > 0) {
+      for (const id of rowSelectionModel) {
         const product = products.find((p) => p.id === id);
         if (product) {
-          onValueChange(product.featureImage);
+          onValueChange(product);
         }
       }
     }
-  }, [selected]);
+  }, [rowSelectionModel]);
 
   const fetchData = async (store: string | undefined, page: string | null) => {
     try {
@@ -115,12 +132,13 @@ export function ProductsTable({ shop, onValueChange }: Props): JSX.Element {
         }}
         pageSizeOptions={[50, 100]}
         checkboxSelection
-        onRowSelectionModelChange={(ids) => {
-          if (ids.length > 4) {
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          if (newRowSelectionModel.length > 4) {
             return;
           }
-          setSelected(ids);
+          setRowSelectionModel(newRowSelectionModel);
         }}
+        rowSelectionModel={rowSelectionModel}
         disableColumnFilter
         disableColumnSelector
         disableDensitySelector

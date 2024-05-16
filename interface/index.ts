@@ -10,3 +10,11 @@ export interface Product {
   category: string;
   featureImage: string;
 }
+
+export interface FormInterface {
+  id?: string;
+  product_items: Product[];
+  tags: string[];
+  name: string;
+  shop: string;
+}
