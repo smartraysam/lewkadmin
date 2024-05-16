@@ -9,6 +9,26 @@ export interface Product {
   quantity: string;
   category: string;
   featureImage: string;
+  tags: string;
+  variants?: variant[];
+  images?: image[];
+}
+
+export interface variant {
+  id: string;
+  title: string;
+  price: string;
+  option1: string;
+  option2: string | null;
+  option3: string | null;
+  inventory_quantity: number;
+  old_inventory_quantity: number;
+  image_id: string | null;
+}
+
+export interface image {
+  src: string;
+  variant_ids: string[];
 }
 
 export interface FormInterface {

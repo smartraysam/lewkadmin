@@ -98,6 +98,7 @@ export function ProductsTable({
         throw new Error("Failed to fetch products");
       }
       const data = await response.json();
+      console.log(data);
       setProducts((prevProducts) => [...prevProducts, ...data.products]);
       if (data.nextPage != undefined) {
         setPageInfo(data.nextPage.page_info);
