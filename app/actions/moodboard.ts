@@ -15,7 +15,6 @@ export async function saveMoodBoard(formData: FormInterface) {
     if (error) {
       return { response: "error" };
     }
-
     return { response: "success" };
   } catch (error) {
     console.error(error);
