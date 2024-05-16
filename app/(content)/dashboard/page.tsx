@@ -194,7 +194,7 @@ const Dashboard = () => {
                     placeHolder="Tag the moodboard"
                   />
                   <em className="text-center italic text-xs">
-                    press enter or comma to add new tag
+                    press enter to add new tag
                   </em>
                   {touched.tags && errors.tags && (
                     <p className="text-xs text-red-500">{errors.tags}</p>
