@@ -31,6 +31,10 @@ export async function GET(request: NextRequest) {
     const results = await shopify.product.list(params);
     const products = results.map((product) => {
       const variants = product.variants.map((variant) => {
+        const hasOutOfStockVariants = {
+          hasOutOfStockVariants: variant.inventory_quantity === 0,
+        };
+
         return {
           id: variant.id,
           title: variant.title,
@@ -38,6 +42,7 @@ export async function GET(request: NextRequest) {
           option1: variant.option1,
           option2: variant.option2,
           option3: variant.option3,
+          product: hasOutOfStockVariants,
           inventory_quantity: variant.inventory_quantity,
           old_inventory_quantity: variant.old_inventory_quantity,
           image_id: variant.image_id,
