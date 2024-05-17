@@ -50,11 +50,11 @@ const Dashboard = () => {
     if (images.length === 4) {
       setImages([]);
     }
-    if (images.includes(value.featureImage)) {
+    if (images.includes(value.image)) {
       return;
     }
     setProducts((prev) => [...prev, value]);
-    setImages((prev) => [...prev, value.featureImage]);
+    setImages((prev) => [...prev, value.image]);
   };
 
   const handleSubmit = async (values: FormInterface, { resetForm }: any) => {

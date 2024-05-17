@@ -4,13 +4,16 @@ export interface SessionData {
 
 export interface Product {
   id: string;
-  product: string;
+  name: string;
+  image: string;
+  url: string;
+  price: string;
+  storeUrl: string;
+  variants?: variant[];
   description: string;
   quantity: string;
   category: string;
-  featureImage: string;
   tags: string;
-  variants?: variant[];
   images?: image[];
 }
 
