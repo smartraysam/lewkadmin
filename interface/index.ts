@@ -21,9 +21,6 @@ export interface variant {
   id: string;
   title: string;
   price: string;
-  option1: string;
-  option2: string | null;
-  option3: string | null;
   inventory_quantity: number;
   old_inventory_quantity: number;
   image_id: string | null;
