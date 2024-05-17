@@ -1,4 +1,3 @@
-import { image, variant } from "./../../../interface/index";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -22,9 +21,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       throw error;
     }
-
     const accesstoken = data[0].accessToken;
-
     const shopify = new Shopify({
       shopName: shop,
       accessToken: accesstoken,
@@ -56,13 +53,16 @@ export async function GET(request: NextRequest) {
         product.image && product.image.src ? product.image.src : "";
       return {
         id: product.id,
-        product: product.title,
+        name: product.title,
+        image: featureImage,
+        url: `https://${shop}/products/` + product.handle,
+        price: product.variants[0].price,
+        storeUrl: `https://${shop}`,
+        variants: variants,
         description: product.body_html,
         quantity: product.variants[0].inventory_quantity,
         category: product.product_type,
-        featureImage: featureImage,
         tags: product.tags,
-        variants: variants,
         images: images,
       };
     });
