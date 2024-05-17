@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { Product } from "@/interface";
 
 const columns: GridColDef[] = [
-  { field: "product", headerName: "Product", width: 150 },
+  { field: "name", headerName: "Product", width: 150 },
   {
     field: "description",
     headerName: "Description",
