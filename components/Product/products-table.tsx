@@ -41,7 +41,7 @@ const columns: GridColDef[] = [
 
 interface Props {
   shop?: string;
-  onValueChange: (value: Product) => void;
+  onValueChange: (value: Product, isSelected: boolean) => void;
   selectedData: Product[];
 }
 
@@ -73,16 +73,16 @@ export function ProductsTable({
     }
   }, [selectedData]);
 
-  useEffect(() => {
-    if (rowSelectionModel.length > 0) {
-      for (const id of rowSelectionModel) {
-        const product = products.find((p) => p.id === id);
-        if (product) {
-          onValueChange(product);
-        }
-      }
-    }
-  }, [rowSelectionModel]);
+  // useEffect(() => {
+  //   if (rowSelectionModel.length > 0) {
+  //     for (const id of rowSelectionModel) {
+  //       const product = products.find((p) => p.id === id);
+  //       if (product) {
+  //         onValueChange(product);
+  //       }
+  //     }
+  //   }
+  // }, [rowSelectionModel]);
 
   const fetchData = async (store: string | undefined, page: string | null) => {
     try {
@@ -132,10 +132,37 @@ export function ProductsTable({
         }}
         pageSizeOptions={[50, 100]}
         checkboxSelection
+        // onRowSelectionModelChange={(newRowSelectionModel) => {
+        //   if (newRowSelectionModel.length > 4) {
+        //     return;
+        //   }
+        //   setRowSelectionModel(newRowSelectionModel);
+        // }}
         onRowSelectionModelChange={(newRowSelectionModel) => {
-          if (newRowSelectionModel.length > 4) {
-            return;
-          }
+          const newSelectionSet = new Set(newRowSelectionModel);
+          const oldSelectionSet = new Set(rowSelectionModel);
+
+          const added = newRowSelectionModel.filter(
+            (x) => !oldSelectionSet.has(x),
+          );
+          const removed = rowSelectionModel.filter(
+            (x) => !newSelectionSet.has(x),
+          );
+
+          added.forEach((id) => {
+            const product = products.find((p) => p.id === id);
+            if (product) {
+              onValueChange(product, true);
+            }
+          });
+
+          removed.forEach((id) => {
+            const product = products.find((p) => p.id === id);
+            if (product) {
+              onValueChange(product, false);
+            }
+          });
+
           setRowSelectionModel(newRowSelectionModel);
         }}
         rowSelectionModel={rowSelectionModel}

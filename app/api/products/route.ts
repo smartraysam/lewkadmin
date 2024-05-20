@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Shopify from "shopify-api-node";
 
-let params = { limit: 100, page_info: "" };
+let params = { limit: 250, page_info: "" };
 
 export async function GET(request: NextRequest) {
   try {

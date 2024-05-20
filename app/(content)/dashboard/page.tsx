@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
 import { Alert, Stack, TextField } from "@mui/material";
-import { ProductsTable } from "@/components/Product/products-table";
+import { ProductsTable } from "@/components/product/products-table";
 import { TagsInput } from "react-tag-input-component";
 import StoreItem from "@/components/store/StoreItem";
 import { FormInterface, Product, SessionData } from "@/interface";
@@ -46,17 +46,17 @@ const Dashboard = () => {
     }
     setShop(store.shop);
   };
-  const handleImageValueChange = (value: Product) => {
-    if (images.length === 4) {
-      setImages([]);
+  const handleImageValueChange = (value: Product, isSelected: boolean) => {
+    if (isSelected) {
+      if (!images.includes(value.image)) {
+        setProducts((prev) => [...prev, value]);
+        setImages((prev) => [...prev, value.image]);
+      }
+    } else {
+      setProducts((prev) => prev.filter((product) => product.id !== value.id));
+      setImages((prev) => prev.filter((image) => image !== value.image));
     }
-    if (images.includes(value.image)) {
-      return;
-    }
-    setProducts((prev) => [...prev, value]);
-    setImages((prev) => [...prev, value.image]);
   };
-
   const handleSubmit = async (values: FormInterface, { resetForm }: any) => {
     if (!shop || products.length === 0) {
       setResponse({ status: "error", message: "Select Products" });
