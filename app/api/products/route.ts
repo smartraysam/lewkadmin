@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const pageinfo = request.nextUrl.searchParams.get("pageinfo") ?? "";
     params.page_info = pageinfo;
     const results = await shopify.product.list(params);
+    console.log(results);
     const products = results.map((product) => {
       const variants = product.variants.map((variant) => {
         const hasOutOfStockVariants = {

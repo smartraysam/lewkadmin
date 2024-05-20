@@ -30,7 +30,7 @@ const initialState = {
 const Dashboard = () => {
   const [tags, setTags] = useState<string[]>(["Party"]);
   const [shop, setShop] = useState<string>("");
-  const [images, setImages] = useState<string[]>(moodboard[0].data);
+  const [images, setImages] = useState<string[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [response, setResponse] = useState<any>({
     status: "",
@@ -118,7 +118,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="h-5/6 w-5/6 flex-auto">
+      <div className="h-5/6 w-4/6 flex-auto">
         <div className="rounded-lg bg-white p-2">
           <Stack spacing={3}>
             <Stack direction="row" spacing={3}>
@@ -138,17 +138,29 @@ const Dashboard = () => {
       </div>
       <div className="h-full w-2/6 flex-auto ">
         <div className="grid h-fit grid-cols-2 gap-2 rounded-md border-2 border-white bg-white">
-          {images.map((image, index) => (
-            <Image
-              key={index}
-              src={image}
-              width={150}
-              height={150}
-              alt="moodboard"
-              className="m-1 rounded-md"
-            />
-          ))}
+          {images.length === 0
+            ? moodboard[0].data.map((image, index) => (
+                <Image
+                  key={index}
+                  src={image}
+                  width={150}
+                  height={150}
+                  alt="moodboard"
+                  className="m-1 rounded-md"
+                />
+              ))
+            : images.map((image, index) => (
+                <Image
+                  key={index}
+                  src={image}
+                  width={150}
+                  height={150}
+                  alt="moodboard"
+                  className="m-1 rounded-md"
+                />
+              ))}
         </div>
+
         <div className="m-2 w-full place-content-center">
           {response.status && (
             <Alert severity={response.status}>{response.message}.</Alert>
