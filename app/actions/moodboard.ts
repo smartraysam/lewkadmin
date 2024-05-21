@@ -1,10 +1,10 @@
 "use server";
-import { FormInterface } from "@/interface";
+import { Moodboard } from "@/interface";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 
-export async function saveMoodBoard(formData: FormInterface) {
+export async function saveMoodBoard(formData: Moodboard) {
   const cookieStore = cookies();
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
   formData.id = uuidv4();
