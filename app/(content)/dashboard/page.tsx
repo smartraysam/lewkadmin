@@ -3,15 +3,15 @@ import { useState } from "react";
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
 import { Alert, Stack, TextField } from "@mui/material";
-import { ProductsTable } from "@/components/Product/products-table";
 import { TagsInput } from "react-tag-input-component";
 import StoreItem from "@/components/store/StoreItem";
-import { FormInterface, Product, SessionData } from "@/interface";
+import { Moodboard, Product, SessionData } from "@/interface";
 import useSWR from "swr";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { z } from "zod";
 import { Form, Formik } from "formik";
 import { saveMoodBoard } from "@/app/actions/moodboard";
+import { ProductsTable } from "@/components/product/productstable";
 
 const boardSchema = z.object({
   tags: z
@@ -30,7 +30,7 @@ const initialState = {
 const Dashboard = () => {
   const [tags, setTags] = useState<string[]>(["Party"]);
   const [shop, setShop] = useState<string>("");
-  const [images, setImages] = useState<string[]>(moodboard[0].data);
+  const [images, setImages] = useState<string[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [response, setResponse] = useState<any>({
     status: "",
@@ -46,18 +46,18 @@ const Dashboard = () => {
     }
     setShop(store.shop);
   };
-  const handleImageValueChange = (value: Product) => {
-    if (images.length === 4) {
-      setImages([]);
+  const handleImageValueChange = (value: Product, isSelected: boolean) => {
+    if (isSelected) {
+      if (!images.includes(value.image)) {
+        setProducts((prev) => [...prev, value]);
+        setImages((prev) => [...prev, value.image]);
+      }
+    } else {
+      setProducts((prev) => prev.filter((product) => product.id !== value.id));
+      setImages((prev) => prev.filter((image) => image !== value.image));
     }
-    if (images.includes(value.image)) {
-      return;
-    }
-    setProducts((prev) => [...prev, value]);
-    setImages((prev) => [...prev, value.image]);
   };
-
-  const handleSubmit = async (values: FormInterface, { resetForm }: any) => {
+  const handleSubmit = async (values: Moodboard, { resetForm }: any) => {
     if (!shop || products.length === 0) {
       setResponse({ status: "error", message: "Select Products" });
       return;
@@ -118,7 +118,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="h-5/6 w-5/6 flex-auto">
+      <div className="h-5/6 w-4/6 flex-auto">
         <div className="rounded-lg bg-white p-2">
           <Stack spacing={3}>
             <Stack direction="row" spacing={3}>
@@ -138,17 +138,29 @@ const Dashboard = () => {
       </div>
       <div className="h-full w-2/6 flex-auto ">
         <div className="grid h-fit grid-cols-2 gap-2 rounded-md border-2 border-white bg-white">
-          {images.map((image, index) => (
-            <Image
-              key={index}
-              src={image}
-              width={150}
-              height={150}
-              alt="moodboard"
-              className="m-1 rounded-md"
-            />
-          ))}
+          {images.length === 0
+            ? moodboard[0].data.map((image, index) => (
+                <Image
+                  key={index}
+                  src={image}
+                  width={150}
+                  height={150}
+                  alt="moodboard"
+                  className="m-1 rounded-md"
+                />
+              ))
+            : images.map((image, index) => (
+                <Image
+                  key={index}
+                  src={image}
+                  width={150}
+                  height={150}
+                  alt="moodboard"
+                  className="m-1 rounded-md"
+                />
+              ))}
         </div>
+
         <div className="m-2 w-full place-content-center">
           {response.status && (
             <Alert severity={response.status}>{response.message}.</Alert>

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Shopify from "shopify-api-node";
 
-let params = { limit: 100, page_info: "" };
+let params = { limit: 250, page_info: "" };
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const pageinfo = request.nextUrl.searchParams.get("pageinfo") ?? "";
     params.page_info = pageinfo;
     const results = await shopify.product.list(params);
+    console.log(results);
     const products = results.map((product) => {
       const variants = product.variants.map((variant) => {
         const hasOutOfStockVariants = {

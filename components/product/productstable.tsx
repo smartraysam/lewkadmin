@@ -4,44 +4,83 @@ import * as React from "react";
 import {
   DataGrid,
   GridColDef,
-  GridRowId,
+  GridRenderCellParams,
   GridRowSelectionModel,
+  GridRowSpacingParams,
   GridToolbar,
 } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Product } from "@/interface";
+import Image from "next/image";
+import { Link } from "@mui/material";
+
+function ExpandableCell({ value }: GridRenderCellParams) {
+  const [expanded, setExpanded] = React.useState(false);
+  return (
+    <div>
+      {expanded ? (
+        <div dangerouslySetInnerHTML={{ __html: value }} />
+      ) : (
+        <div dangerouslySetInnerHTML={{ __html: value.slice(0, 200) }} />
+      )}
+      {value.length > 200 && (
+        <Link
+          type="button"
+          component="button"
+          className="text-blue-400 cursor-pointer"
+          sx={{ fontSize: "8px" }}
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? "view less" : "view more"}
+        </Link>
+      )}
+    </div>
+  );
+}
 
 const columns: GridColDef[] = [
   { field: "name", headerName: "Product", width: 150 },
   {
     field: "description",
     headerName: "Description",
-    renderCell: (params) => (
-      <div
-        dangerouslySetInnerHTML={{
-          __html: params.value,
-        }}
-      />
+    renderCell: (params: GridRenderCellParams) => (
+      <ExpandableCell {...params} />
     ),
     sortable: false,
     flex: 1,
   },
   {
-    field: "quantity",
-    headerName: "Inventory",
-    type: "number",
-    width: 100,
+    field: "image",
+    headerName: "Feature Image",
+    renderCell: (params) => (
+      <Image
+        alt="Image"
+        width={0}
+        height={0}
+        sizes="100vw"
+        style={{ width: "auto", height: "180px" }}
+        src={params.value}
+      />
+    ),
+    sortable: false,
+    width: 150,
   },
   {
-    field: "category",
-    headerName: "Category",
-    width: 100,
+    field: "quantity",
+    headerName: "Qty.",
+    type: "number",
+    width: 60,
+  },
+  {
+    field: "tags",
+    headerName: "Tags",
+    width: 120,
   },
 ];
 
 interface Props {
   shop?: string;
-  onValueChange: (value: Product) => void;
+  onValueChange: (value: Product, isSelected: boolean) => void;
   selectedData: Product[];
 }
 
@@ -73,17 +112,6 @@ export function ProductsTable({
     }
   }, [selectedData]);
 
-  useEffect(() => {
-    if (rowSelectionModel.length > 0) {
-      for (const id of rowSelectionModel) {
-        const product = products.find((p) => p.id === id);
-        if (product) {
-          onValueChange(product);
-        }
-      }
-    }
-  }, [rowSelectionModel]);
-
   const fetchData = async (store: string | undefined, page: string | null) => {
     try {
       if (page === null) {
@@ -107,12 +135,20 @@ export function ProductsTable({
       setIsLoading(false);
     } catch (error) {}
   };
-
+  const getRowSpacing = React.useCallback((params: GridRowSpacingParams) => {
+    return {
+      top: params.isFirstVisible ? 10 : 5,
+      bottom: params.isLastVisible ? 0 : 5,
+    };
+  }, []);
   return (
-    <div style={{ height: "750px", width: "95%" }}>
+    <div style={{ height: "750px", width: "100%" }}>
       <DataGrid
+        getEstimatedRowHeight={() => 100}
+        getRowHeight={() => "auto"}
         rows={products}
         columns={columns}
+        getRowSpacing={getRowSpacing}
         pagination
         paginationMode="client"
         onPaginationModelChange={(newPaginationModel) => {
@@ -133,9 +169,30 @@ export function ProductsTable({
         pageSizeOptions={[50, 100]}
         checkboxSelection
         onRowSelectionModelChange={(newRowSelectionModel) => {
-          if (newRowSelectionModel.length > 4) {
-            return;
-          }
+          const newSelectionSet = new Set(newRowSelectionModel);
+          const oldSelectionSet = new Set(rowSelectionModel);
+
+          const added = newRowSelectionModel.filter(
+            (x) => !oldSelectionSet.has(x),
+          );
+          const removed = rowSelectionModel.filter(
+            (x) => !newSelectionSet.has(x),
+          );
+
+          added.forEach((id) => {
+            const product = products.find((p) => p.id === id);
+            if (product) {
+              onValueChange(product, true);
+            }
+          });
+
+          removed.forEach((id) => {
+            const product = products.find((p) => p.id === id);
+            if (product) {
+              onValueChange(product, false);
+            }
+          });
+
           setRowSelectionModel(newRowSelectionModel);
         }}
         rowSelectionModel={rowSelectionModel}
