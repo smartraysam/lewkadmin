@@ -3,7 +3,6 @@ import { useState } from "react";
 import Image from "next/image";
 import moodboard from "@/data/moodboard/data";
 import { Alert, Stack, TextField } from "@mui/material";
-import { ProductsTable } from "@/components/product/products-table";
 import { TagsInput } from "react-tag-input-component";
 import StoreItem from "@/components/store/StoreItem";
 import { Moodboard, Product, SessionData } from "@/interface";
@@ -12,6 +11,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { z } from "zod";
 import { Form, Formik } from "formik";
 import { saveMoodBoard } from "@/app/actions/moodboard";
+import { ProductsTable } from "@/components/product/productstable";
 
 const boardSchema = z.object({
   tags: z
