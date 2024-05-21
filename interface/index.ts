@@ -31,7 +31,7 @@ export interface image {
   variant_ids: string[];
 }
 
-export interface FormInterface {
+export interface Moodboard {
   id?: string;
   product_items: Product[];
   tags: string[];

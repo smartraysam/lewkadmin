@@ -9,7 +9,6 @@ import { Dashboard } from "@mui/icons-material";
 export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
   // Chakra color mode
   const pathname = usePathname();
-
   const { routes } = props;
 
   // verifies if routeName is the one active (in browser input)
@@ -31,7 +30,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
             >
               <span
                 className={`${
-                  activeRoute(route.path) === true
+                  activeRoute(route.layout) === true
                     ? "font-bold text-blue-700"
                     : "font-medium text-gray-600"
                 }`}
@@ -40,15 +39,15 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
               </span>
               <p
                 className={`leading-1 ml-4 flex ${
-                  activeRoute(route.path) === true
+                  activeRoute(route.layout) === true
                     ? "font-bold text-gray-700"
                     : "font-medium text-gray-600"
                 }`}
               >
-                Dashboard
+                {route.name}
               </p>
             </li>
-            {activeRoute(route.path) ? (
+            {activeRoute(route.layout) ? (
               <div className="absolute right-0 top-px h-9 w-1 rounded-lg bg-blue-700" />
             ) : null}
           </div>

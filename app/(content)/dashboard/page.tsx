@@ -6,7 +6,7 @@ import { Alert, Stack, TextField } from "@mui/material";
 import { ProductsTable } from "@/components/product/products-table";
 import { TagsInput } from "react-tag-input-component";
 import StoreItem from "@/components/store/StoreItem";
-import { FormInterface, Product, SessionData } from "@/interface";
+import { Moodboard, Product, SessionData } from "@/interface";
 import useSWR from "swr";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { z } from "zod";
@@ -57,7 +57,7 @@ const Dashboard = () => {
       setImages((prev) => prev.filter((image) => image !== value.image));
     }
   };
-  const handleSubmit = async (values: FormInterface, { resetForm }: any) => {
+  const handleSubmit = async (values: Moodboard, { resetForm }: any) => {
     if (!shop || products.length === 0) {
       setResponse({ status: "error", message: "Select Products" });
       return;

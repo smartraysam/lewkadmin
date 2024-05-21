@@ -14,6 +14,7 @@ export const findCurrentRoute = (
     }
     if (pathname?.match(route.path) && route) return route;
   }
+  return undefined;
 };
 
 export const getActiveRoute = (routes: IRoute[], pathname: string): string => {

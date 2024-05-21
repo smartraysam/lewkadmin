@@ -6,7 +6,6 @@ import Sidebar from "@/components/sidebar";
 import Navbar from "@/components/navbar";
 import { getActiveNavbar, getActiveRoute } from "@/utils/navigation";
 import routes from "@/utils/routes";
-import Footer from "@/components/footer/Footer";
 
 export default function Admin({ children }: { children: React.ReactNode }) {
   // states and functions
