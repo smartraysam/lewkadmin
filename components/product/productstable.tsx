@@ -21,9 +21,9 @@ function ExpandableCell({ value }: GridRenderCellParams) {
       {expanded ? (
         <div dangerouslySetInnerHTML={{ __html: value }} />
       ) : (
-        <div dangerouslySetInnerHTML={{ __html: value.slice(0, 200) }} />
+        <div dangerouslySetInnerHTML={{ __html: value?.slice(0, 200) }} />
       )}
-      {value.length > 200 && (
+      {value?.length > 200 && (
         <Link
           type="button"
           component="button"
