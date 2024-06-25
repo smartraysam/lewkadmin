@@ -13,7 +13,7 @@ export default function Admin({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex w-full bg-gray-100">
+    <div className="flex w-full bg-gray-100 h-full">
       <Sidebar routes={routes} open={open} setOpen={setOpen} variant="admin" />
       <div className="w-full font-dm">
         <main

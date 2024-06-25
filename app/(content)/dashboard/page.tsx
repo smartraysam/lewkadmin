@@ -66,7 +66,7 @@ const Dashboard = () => {
       tags: tags,
       name: values.name,
       product_items: products,
-      shop: shop,
+      shop: shop.shop,
     };
     try {
       const data = await saveMoodBoard(formData);
@@ -96,7 +96,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="mt-5 flex h-[500] gap-2">
+    <div className="flex min-h-full gap-2">
       <div className="w-[250px] flex-none ">
         <div className="flex-colrounded-sm h-full border border-white bg-white">
           <div className="border-b-2 border-gray-400 p-4">
@@ -117,8 +117,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="h-5/6 w-4/6 flex-auto">
-        <div className="rounded-lg bg-white p-2">
+      <div className="w-4/6 flex-auto">
+        <div className="rounded-lg h-full bg-white">
           <Stack spacing={3}>
             <Stack direction="row" spacing={3}>
               <Stack spacing={1} sx={{ flex: "1 1 auto" }}>

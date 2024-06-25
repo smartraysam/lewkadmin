@@ -142,7 +142,7 @@ export function ProductsTable({
     };
   }, []);
   return (
-    <div style={{ height: "750px", width: "100%" }}>
+    <div className="h-[500px] w-full">
       <DataGrid
         getEstimatedRowHeight={() => 100}
         getRowHeight={() => "auto"}
