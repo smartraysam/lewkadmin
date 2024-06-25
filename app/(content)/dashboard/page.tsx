@@ -5,13 +5,14 @@ import moodboard from "@/data/moodboard/data";
 import { Alert, Stack, TextField } from "@mui/material";
 import { TagsInput } from "react-tag-input-component";
 import StoreItem from "@/components/store/StoreItem";
-import { Moodboard, Product, SessionData } from "@/interface";
+import { Moodboard, Product, SessionData, StoreInfo } from "@/interface";
 import useSWR from "swr";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { z } from "zod";
 import { Form, Formik } from "formik";
 import { saveMoodBoard } from "@/app/actions/moodboard";
 import { ProductsTable } from "@/components/product/productstable";
+import { Store } from "@mui/x-data-grid/utils/Store";
 
 const boardSchema = z.object({
   tags: z
@@ -29,7 +30,7 @@ const initialState = {
 };
 const Dashboard = () => {
   const [tags, setTags] = useState<string[]>(["Party"]);
-  const [shop, setShop] = useState<string>("");
+  const [shop, setShop] = useState<StoreInfo>();
   const [images, setImages] = useState<string[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [response, setResponse] = useState<any>({
@@ -38,13 +39,12 @@ const Dashboard = () => {
   });
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
   const { data: stores, error: storesError } = useSWR("/api/store", fetcher);
-  const handleItemClick = (store: SessionData) => {
-    if (shop === store.shop) {
+  const handleItemClick = (store: StoreInfo) => {
+    if (shop === store) {
       return;
     }
-    setShop(store.shop);
+    setShop(store);
   };
   const handleImageValueChange = (value: Product, isSelected: boolean) => {
     if (isSelected) {
@@ -68,7 +68,6 @@ const Dashboard = () => {
       product_items: products,
       shop: shop,
     };
-    console.log(formData);
     try {
       const data = await saveMoodBoard(formData);
       setImages([]);
@@ -98,7 +97,7 @@ const Dashboard = () => {
 
   return (
     <div className="mt-5 flex h-[500] gap-2">
-      <div className="w-1/6 flex-none ">
+      <div className="w-[250px] flex-none ">
         <div className="flex-colrounded-sm h-full border border-white bg-white">
           <div className="border-b-2 border-gray-400 p-4">
             <h4 className="b-4 font-bold">Available Stores</h4>
@@ -107,12 +106,12 @@ const Dashboard = () => {
           <div className="overflow-y-scroll">
             {stores &&
               stores.length > 0 &&
-              stores.map((store: SessionData, index: number) => (
+              stores.map((store: StoreInfo, index: number) => (
                 <StoreItem
                   key={index}
-                  name={store.shop.replace(/-|\.myshopify\.com/g, "")}
+                  name={store.name.replace(/-|\.myshopify\.com/g, "")}
                   onClick={() => handleItemClick(store)}
-                  selected={shop === store.shop}
+                  selected={shop === store}
                 />
               ))}
           </div>
@@ -124,7 +123,7 @@ const Dashboard = () => {
             <Stack direction="row" spacing={3}>
               <Stack spacing={1} sx={{ flex: "1 1 auto" }}>
                 <h1 className="text-[40] font-bold text-black m-4">
-                  Available Products {shop ? `on ${shop}` : ""}
+                  Available Products {shop ? `on ${shop.name}` : ""}
                 </h1>
               </Stack>
             </Stack>
@@ -136,7 +135,7 @@ const Dashboard = () => {
           </Stack>
         </div>
       </div>
-      <div className="h-full w-2/6 flex-auto ">
+      <div className="h-full w-[250px] flex-auto ">
         <div className="grid h-fit grid-cols-2 gap-2 rounded-md border-2 border-white bg-white">
           {images.length === 0
             ? moodboard[0].data.map((image, index) => (

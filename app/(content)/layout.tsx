@@ -18,7 +18,7 @@ export default function Admin({ children }: { children: React.ReactNode }) {
       <div className="w-full font-dm">
         <main
           className={`mx-2.5 flex-none transition-all 
-              md:pr-2 xl:ml-[323px]`}
+              md:pr-2 xl:ml-[200px]`}
         >
           <div>
             <Navbar

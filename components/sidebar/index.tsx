@@ -6,7 +6,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
   return (
     <div
-      className={`sm:none duration-175 linear fixed !z-50 flex min-h-full flex-col bg-white pb-10 shadow-2xl shadow-white/5 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
+      className={`sm:none duration-175 linear w-[200px] fixed !z-50 flex min-h-full flex-col bg-white pb-10 shadow-2xl shadow-white/5 transition-all dark:!bg-navy-800 dark:text-white md:!z-50 lg:!z-50 xl:!z-0 ${
         open ? "translate-x-0" : "-translate-x-96 xl:translate-x-0"
       }`}
     >
@@ -17,12 +17,12 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
       
       </span>
 
-      <div className={`mx-[56px] mt-[50px] flex items-center`}>
-        <div className="ml-1 mt-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-gray-600">
+      <div className={`mx-5 mt-[50px] flex items-center`}>
+        <div className="ml-1 mt-1 h-2.5 font-poppins text-xl font-bold uppercase text-gray-600">
           LEWK's <span className="font-medium">Admin</span>
         </div>
       </div>
-      <div className="mb-7 mt-[58px] h-px bg-gray-300" />
+      <div className="mb-7 mt-8 h-px bg-gray-300" />
       {/* Nav item */}
 
       <ul className="mb-auto pt-1">

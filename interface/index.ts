@@ -1,7 +1,11 @@
 export interface SessionData {
   shop: string;
+  accessToken: string;
 }
 
+export interface StoreInfo extends SessionData {
+  name: string;
+}
 export interface Product {
   id: string;
   name: string;

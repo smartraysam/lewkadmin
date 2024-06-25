@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Alert, Stack, TextField } from "@mui/material";
 import StoreItem from "@/components/store/StoreItem";
 import useSWR from "swr";
-import { SessionData } from "@/interface";
+import { SessionData, StoreInfo } from "@/interface";
 import MoodboardItem from "@/components/moodboard";
 
 const Moodboard = () => {
@@ -23,11 +23,11 @@ const Moodboard = () => {
     error: moodboardError,
   } = useSWR(shop ? `/api/moodboard?shop=${shop}` : "/api/moodboard", fetcher);
 
-  const handleItemClick = (store: SessionData) => {
+  const handleItemClick = (store: StoreInfo) => {
     if (shop === store.shop) {
       return;
     }
-    setShop(store.shop);
+    setShop(store.name);
   };
   return (
     <div className="mt-5 flex h-[500] gap-2">
@@ -41,7 +41,7 @@ const Moodboard = () => {
             {!storeLoading &&
               stores &&
               stores.length > 0 &&
-              stores.map((store: SessionData, index: number) => (
+              stores.map((store: StoreInfo, index: number) => (
                 <StoreItem
                   key={index}
                   name={store.shop.replace(/-|\.myshopify\.com/g, "")}

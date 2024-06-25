@@ -10,7 +10,7 @@ import {
   GridToolbar,
 } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { Product } from "@/interface";
+import { Product, StoreInfo } from "@/interface";
 import Image from "next/image";
 import { Link } from "@mui/material";
 
@@ -79,7 +79,7 @@ const columns: GridColDef[] = [
 ];
 
 interface Props {
-  shop?: string;
+  shop?: StoreInfo;
   onValueChange: (value: Product, isSelected: boolean) => void;
   selectedData: Product[];
 }
@@ -97,11 +97,11 @@ export function ProductsTable({
     useState<GridRowSelectionModel>([]);
   let store = "";
   useEffect(() => {
-    if (shop) {
+    if (shop !== undefined) {
       setIsLoading(true);
       setProducts([]);
       setPageInfo("");
-      store = shop;
+      store = shop.shop;
       fetchData(store, "");
     }
   }, [shop]);
@@ -156,7 +156,7 @@ export function ProductsTable({
             setPageInfo(null);
           } else {
             setIsLoading(true);
-            fetchData(shop, pageInfo);
+            fetchData(shop?.shop, pageInfo);
           }
           setPrev(newPaginationModel.page);
         }}
