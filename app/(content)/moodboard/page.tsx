@@ -1,13 +1,12 @@
 "use client";
 import { useState } from "react";
-import { Alert, Stack, TextField } from "@mui/material";
 import StoreItem from "@/components/store/StoreItem";
 import useSWR from "swr";
-import { SessionData, StoreInfo } from "@/interface";
+import { StoreInfo } from "@/interface";
 import MoodboardItem from "@/components/moodboard";
 
 const Moodboard = () => {
-  const [shop, setShop] = useState<string>("");
+  const [shop, setShop] = useState<StoreInfo>();
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -21,13 +20,16 @@ const Moodboard = () => {
     data: moodboard,
     isLoading: boardLoading,
     error: moodboardError,
-  } = useSWR(shop ? `/api/moodboard?shop=${shop}` : "/api/moodboard", fetcher);
+  } = useSWR(
+    shop ? `/api/moodboard?shop=${shop.shop}` : "/api/moodboard",
+    fetcher,
+  );
 
   const handleItemClick = (store: StoreInfo) => {
-    if (shop === store.shop) {
+    if (shop === store) {
       return;
     }
-    setShop(store.name);
+    setShop(store);
   };
   return (
     <div className="mt-5 flex h-[500] gap-2">
@@ -44,9 +46,9 @@ const Moodboard = () => {
               stores.map((store: StoreInfo, index: number) => (
                 <StoreItem
                   key={index}
-                  name={store.shop.replace(/-|\.myshopify\.com/g, "")}
+                  name={store.name.replace(/-|\.myshopify\.com/g, "")}
                   onClick={() => handleItemClick(store)}
-                  selected={shop === store.shop}
+                  selected={shop === store}
                 />
               ))}
           </div>
@@ -56,7 +58,7 @@ const Moodboard = () => {
         <div className="rounded-lg bg-white p-2 h-screen">
           <div>
             <h1 className="text-[40] font-bold text-black m-4">
-              Available Moodboard {shop ? `on ${shop}` : ""}
+              Available Moodboard {shop ? `on ${shop.name}` : ""}
             </h1>
             {!boardLoading && moodboard && moodboard.length > 0 ? (
               <MoodboardItem moodboards={moodboard} />
