@@ -135,7 +135,7 @@ const Dashboard = () => {
           </Stack>
         </div>
       </div>
-      <div className="h-full w-[250px] flex-auto ">
+      <div className="h-full w-[300px] flex-auto ">
         <div className="grid h-fit grid-cols-2 gap-2 rounded-md border-2 border-white bg-white">
           {images.length === 0
             ? moodboard[0].data.map((image, index) => (
