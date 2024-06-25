@@ -96,7 +96,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex min-h-full gap-2">
+    <div className="flex min-h-screen gap-2">
       <div className="w-[250px] flex-none ">
         <div className="flex-colrounded-sm h-full border border-white bg-white">
           <div className="border-b-2 border-gray-400 p-4">
@@ -119,7 +119,7 @@ const Dashboard = () => {
       </div>
       <div className="w-4/6 flex-auto">
         <div className="rounded-lg h-full bg-white">
-          <Stack spacing={3}>
+          <Stack spacing={3} className="min-h-screen">
             <Stack direction="row" spacing={3}>
               <Stack spacing={1} sx={{ flex: "1 1 auto" }}>
                 <h1 className="text-[40] font-bold text-black m-4">

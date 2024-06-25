@@ -13,20 +13,20 @@ export default function Admin({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex w-full bg-gray-100 h-full">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <Sidebar routes={routes} open={open} setOpen={setOpen} variant="admin" />
-      <div className="w-full font-dm">
+      <div className="w-full font-dm h-screen">
         <main
-          className={`mx-2.5 flex-none transition-all 
+          className={`mx-2.5 flex-none transition-all min-h-screen 
               md:pr-2 xl:ml-[200px]`}
         >
-          <div>
+          <div className="min-h-screen">
             <Navbar
               onOpenSidenav={() => setOpen(!open)}
               brandText={getActiveRoute(routes, pathname)}
               secondary={getActiveNavbar(routes, pathname)}
             />
-            <div className="p-2">{children}</div>
+            <div className="p-2 min-h-screen">{children}</div>
           </div>
         </main>
       </div>
