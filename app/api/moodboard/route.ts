@@ -10,7 +10,7 @@ export const GET = async (request: NextRequest) => {
     try {
       const { data, error } = await supabase
         .from("PreMadeMoodboard")
-        .select("name, product_items, tags, shop");
+        .select("id, name, product_items, tags, shop");
       if (error) {
         throw error;
       }
@@ -23,7 +23,7 @@ export const GET = async (request: NextRequest) => {
     try {
       const { data, error } = await supabase
         .from("PreMadeMoodboard")
-        .select("name, product_items, tags, shop")
+        .select("id, name, product_items, tags, shop")
         .eq("shop", shop);
       if (error) {
         throw error;
