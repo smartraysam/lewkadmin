@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
 import StoreItem from "@/components/store/StoreItem";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { StoreInfo } from "@/interface";
 import MoodboardItem from "@/components/moodboard";
+import { deleteMoodBoard } from "@/app/actions/moodboard";
 
 const Moodboard = () => {
   const [shop, setShop] = useState<StoreInfo>();
@@ -20,10 +21,16 @@ const Moodboard = () => {
     data: moodboard,
     isLoading: boardLoading,
     error: moodboardError,
+    mutate,
   } = useSWR(
     shop ? `/api/moodboard?shop=${shop.shop}` : "/api/moodboard",
     fetcher,
   );
+
+  const refresh = () => {
+    console.log("refresh");
+    mutate();
+  };
 
   const handleItemClick = (store: StoreInfo) => {
     if (shop === store) {
@@ -31,6 +38,7 @@ const Moodboard = () => {
     }
     setShop(store);
   };
+
   return (
     <div className="mt-5 flex h-[500] gap-2">
       <div className="w-1/6 flex-none ">
@@ -61,7 +69,7 @@ const Moodboard = () => {
               Available Moodboard {shop ? `on ${shop.name}` : ""}
             </h1>
             {!boardLoading && moodboard && moodboard.length > 0 ? (
-              <MoodboardItem moodboards={moodboard} />
+              <MoodboardItem moodboards={moodboard} onClick={refresh} />
             ) : (
               <div className="text-center h-screen mt-52">
                 {boardLoading

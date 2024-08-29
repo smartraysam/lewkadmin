@@ -21,3 +21,21 @@ export async function saveMoodBoard(formData: Moodboard) {
     return { response: "Unable to save moodboard." };
   }
 }
+
+export async function deleteMoodBoard(id: string) {
+  const cookieStore = cookies();
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  try {
+    const { data, error } = await supabase
+      .from("PreMadeMoodboard")
+      .delete()
+      .match({ id });
+    if (error) {
+      return { response: "error" };
+    }
+    return { response: "success" };
+  } catch (error) {
+    console.error(error);
+    return { response: "Unable to delete moodboard." };
+  }
+}

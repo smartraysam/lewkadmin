@@ -6,6 +6,8 @@ import Sidebar from "@/components/sidebar";
 import Navbar from "@/components/navbar";
 import { getActiveNavbar, getActiveRoute } from "@/utils/navigation";
 import routes from "@/utils/routes";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Admin({ children }: { children: React.ReactNode }) {
   // states and functions
@@ -14,6 +16,7 @@ export default function Admin({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
+      <ToastContainer />
       <Sidebar routes={routes} open={open} setOpen={setOpen} variant="admin" />
       <div className="w-full font-dm h-screen">
         <main
