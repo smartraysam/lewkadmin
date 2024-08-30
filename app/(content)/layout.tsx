@@ -6,8 +6,8 @@ import Sidebar from "@/components/sidebar";
 import Navbar from "@/components/navbar";
 import { getActiveNavbar, getActiveRoute } from "@/utils/navigation";
 import routes from "@/utils/routes";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export default function Admin({ children }: { children: React.ReactNode }) {
   // states and functions

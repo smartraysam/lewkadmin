@@ -42,3 +42,54 @@ export interface Moodboard {
   name: string;
   shop: string;
 }
+
+interface ProductNode {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  totalInventory: number;
+  priceRange: {
+    maxVariantPrice: {
+      amount: string;
+    };
+  };
+  featuredImage: {
+    url: string;
+  } | null;
+  productType: string;
+  vendor: string;
+  variants: {
+    edges: {
+      node: {
+        id: string;
+        price: string;
+        title: string;
+        inventoryQuantity: number;
+        image: {
+          url: string;
+        } | null;
+        selectedOptions: {
+          name: string;
+          value: string;
+        }[];
+      };
+    }[];
+  };
+}
+
+interface ProductEdge {
+  cursor: string;
+  node: ProductNode;
+}
+
+interface ProductsResponse {
+  data: {
+    products: {
+      edges: ProductEdge[];
+      pageInfo: {
+        hasNextPage: boolean;
+      };
+    };
+  };
+}
