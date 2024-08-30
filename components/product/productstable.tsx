@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { Product, StoreInfo } from "@/interface";
 import Image from "next/image";
 import { Link } from "@mui/material";
+import { fetchStoreProduct } from "@/lib";
 
 function ExpandableCell({ value }: GridRenderCellParams) {
   const [expanded, setExpanded] = React.useState(false);
@@ -96,6 +97,7 @@ export function ProductsTable({
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
   let store = "";
+
   useEffect(() => {
     if (shop !== undefined) {
       setIsLoading(true);
@@ -107,40 +109,107 @@ export function ProductsTable({
   }, [shop]);
 
   useEffect(() => {
-    if (selectedData.length == 0) {
+    if (selectedData.length === 0) {
       setRowSelectionModel([]);
     }
   }, [selectedData]);
 
-  const fetchData = async (store: string | undefined, page: string | null) => {
+  const fetchData = async (
+    store: string | undefined,
+    cursor: string | null,
+  ) => {
     try {
-      if (page === null) {
+      if (!store) return;
+
+      if (cursor === null) {
         setIsLoading(false);
         return;
       }
-      const response = await fetch(
-        `/api/products?pageinfo=${page}&shop=${store}`,
+      const afterClause = cursor ? `, after: "${cursor}"` : "";
+      const query = {
+        query: `
+        {
+          products(first: 250${afterClause}, query: "status:active AND published_status:published AND inventory_total:>0") {
+            edges {
+              cursor
+              node {
+                id
+                title
+                description
+                totalInventory
+                priceRange {
+                  maxVariantPrice {
+                    amount
+                  }
+                }
+                featuredImage {
+                  url
+                }
+                productType
+                vendor
+                tags
+                variants(first: 10) {
+                  edges {
+                    node {
+                      id
+                      price
+                      title
+                      inventoryQuantity
+                      image {
+                        url
+                      }
+                      selectedOptions {
+                        name
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+            }
+          }
+        }`,
+      };
+
+      const response = await fetchStoreProduct(
+        store,
+        query,
+        shop?.accessToken || "",
       );
-      if (!response.ok) {
-        setIsLoading(false);
-        throw new Error("Failed to fetch products");
-      }
-      const data = await response.json();
-      setProducts((prevProducts) => [...prevProducts, ...data.products]);
-      if (data.nextPage != undefined) {
-        setPageInfo(data.nextPage.page_info);
-      } else {
-        setPageInfo(null);
-      }
+      const data = response.data;
+      const fetchedProducts = data?.products?.edges || [];
+      const newProducts = fetchedProducts.map((edge: any) => ({
+        id: edge.node.id,
+        name: edge.node.title,
+        description: edge.node.description,
+        quantity: edge.node.totalInventory,
+        image: edge.node.featuredImage?.url,
+        tags: edge.node.tags,
+      }));
+
+      setProducts((prevProducts) => [...prevProducts, ...newProducts]);
+      setPageInfo(
+        data.products.pageInfo.hasNextPage
+          ? data.products.edges.slice(-1)[0]?.cursor
+          : null,
+      );
       setIsLoading(false);
-    } catch (error) {}
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to fetch products", error);
+    }
   };
+
   const getRowSpacing = React.useCallback((params: GridRowSpacingParams) => {
     return {
       top: params.isFirstVisible ? 10 : 5,
       bottom: params.isLastVisible ? 0 : 5,
     };
   }, []);
+
   return (
     <div className="w-full h-[650px]">
       <DataGrid
