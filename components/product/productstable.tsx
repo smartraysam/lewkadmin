@@ -136,7 +136,9 @@ export function ProductsTable({
                 id
                 title
                 description
-                totalInventory
+                totalInventory,
+                onlineStoreUrl,
+                handle,
                 priceRange {
                   maxVariantPrice {
                     amount
@@ -183,11 +185,22 @@ export function ProductsTable({
       const fetchedProducts = data?.products?.edges || [];
       const newProducts = fetchedProducts.map((edge: any) => ({
         id: edge.node.id,
-        name: edge.node.title,
+        title: edge.node.title,
         description: edge.node.description,
         quantity: edge.node.totalInventory,
         image: edge.node.featuredImage?.url,
+        handle: edge.node.handle,
         tags: edge.node.tags,
+        onlineStoreUrl: edge.node.onlineStoreUrl,
+        productType: edge.node.productType,
+        variants: edge.node.variants.edges.map((variant: any) => ({
+          id: variant.node.id,
+          price: variant.node.price,
+          title: variant.node.title,
+          inventoryQuantity: variant.node.inventoryQuantity,
+          image: variant.node.image?.url,
+          selectedOptions: variant.node.selectedOptions,
+        })),
       }));
 
       setProducts((prevProducts) => [...prevProducts, ...newProducts]);
