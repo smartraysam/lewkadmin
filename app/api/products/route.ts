@@ -65,6 +65,7 @@ export async function GET(request: NextRequest) {
         price: product.variants[0].price,
         storeUrl: `https://${shop}`,
         variants: variants,
+        handle: product.handle,
         description: product.body_html,
         quantity: product.variants[0].inventory_quantity,
         category: product.product_type,
