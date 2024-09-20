@@ -24,6 +24,7 @@ export const fetchStoreProduct = async (
 interface Product {
   id: string;
   title: string;
+  onlineStoreUrl: string;
   description: string;
   tags: string[];
   totalInventory: number;
