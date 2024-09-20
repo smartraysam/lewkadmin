@@ -45,7 +45,7 @@ export const GET = async (request: NextRequest) => {
   }
 };
 
-export const getProductDetails = async (
+const getProductDetails = async (
   id: string,
   store: string,
   accessToken: string,
