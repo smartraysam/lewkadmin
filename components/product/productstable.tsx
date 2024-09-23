@@ -202,7 +202,6 @@ export function ProductsTable({
           selectedOptions: variant.node.selectedOptions,
         })),
       }));
-
       setProducts((prevProducts) => [...prevProducts, ...newProducts]);
       setPageInfo(
         data.products.pageInfo.hasNextPage
