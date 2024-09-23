@@ -117,22 +117,16 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="w-4/6 flex-auto">
-        <div className="rounded-lg h-full bg-white">
-          <Stack spacing={3} className="min-h-screen">
-            <Stack direction="row" spacing={3}>
-              <Stack spacing={1} sx={{ flex: "1 1 auto" }}>
-                <h1 className="text-[40] font-bold text-black m-4">
-                  Available Products {shop ? `on ${shop.name}` : ""}
-                </h1>
-              </Stack>
-            </Stack>
-            <ProductsTable
-              shop={shop}
-              onValueChange={handleImageValueChange}
-              selectedData={products}
-            />
-          </Stack>
+      <div className="w-4/6 flex-auto mb-10 h-full bg-white ">
+        <h1 className="text-[40] font-bold text-black m-4">
+          Available Products {shop ? `on ${shop.name}` : ""}
+        </h1>
+        <div className="w-full h-full">
+          <ProductsTable
+            shop={shop}
+            onValueChange={handleImageValueChange}
+            selectedData={products}
+          />
         </div>
       </div>
       <div className="h-full w-[300px] flex-auto ">

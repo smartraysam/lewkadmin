@@ -40,7 +40,7 @@ function ExpandableCell({ value }: GridRenderCellParams) {
 }
 
 const columns: GridColDef[] = [
-  { field: "name", headerName: "Product", width: 150 },
+  { field: "title", headerName: "Product", width: 150 },
   {
     field: "description",
     headerName: "Description",
@@ -129,7 +129,7 @@ export function ProductsTable({
       const query = {
         query: `
         {
-          products(first: 250${afterClause}, query: "status:active AND published_status:published AND inventory_total:>0") {
+          products(first: 250 ${afterClause}, query: "status:active AND published_status:published AND inventory_total:>0") {
             edges {
               cursor
               node {
@@ -210,6 +210,9 @@ export function ProductsTable({
           : null,
       );
       setIsLoading(false);
+      if (data.products.pageInfo.hasNextPage) {
+        fetchData(store, data.products.edges.slice(-1)[0]?.cursor);
+      }
     } catch (error) {
       setIsLoading(false);
       console.error("Failed to fetch products", error);
@@ -222,9 +225,15 @@ export function ProductsTable({
       bottom: params.isLastVisible ? 0 : 5,
     };
   }, []);
-
   return (
-    <div className="w-full h-[650px]">
+    <div className="w-full h-[700px]">
+      {pageInfo && (
+        <div className="w-full text-center">
+          <span className="italic text-sm w-full text-center">
+            Fetching more products from store...
+          </span>
+        </div>
+      )}
       <DataGrid
         getEstimatedRowHeight={() => 100}
         getRowHeight={() => "auto"}
@@ -237,8 +246,10 @@ export function ProductsTable({
           if (newPaginationModel.page < prev) {
             setPageInfo(null);
           } else {
-            setIsLoading(true);
-            fetchData(shop?.shop, pageInfo);
+            if (pageInfo !== null) {
+              setIsLoading(true);
+              fetchData(shop?.shop, pageInfo);
+            }
           }
           setPrev(newPaginationModel.page);
         }}
