@@ -226,7 +226,7 @@ export function ProductsTable({
     };
   }, []);
   return (
-    <div className="w-full h-[700px]">
+    <div className="w-full h-[700px] py-10">
       {pageInfo && (
         <div className="w-full text-center">
           <span className="italic text-sm w-full text-center">
@@ -235,7 +235,7 @@ export function ProductsTable({
         </div>
       )}
       <DataGrid
-        getEstimatedRowHeight={() => 100}
+        getEstimatedRowHeight={() => 50}
         getRowHeight={() => "auto"}
         rows={products}
         columns={columns}
