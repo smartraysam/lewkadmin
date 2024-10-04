@@ -107,9 +107,8 @@ const getProductDetails = async (
     image: fetchedProducts.featuredImage?.url,
     handle: fetchedProducts.handle,
     tags: fetchedProducts.tags,
-    url:
-      "https://lewk-bellisima.myshopify.com/products/" + fetchedProducts.handle,
-    storeUrl: "https://lewk-bellisima.myshopify.com",
+    url: `https://${store}/products/ ${fetchedProducts.handle}`,
+    storeUrl: `https://${store}`,
     onlineStoreUrl: fetchedProducts.onlineStoreUrl,
     productType: fetchedProducts.productType,
     variants: fetchedProducts.variants.edges.map((variant: any) => ({
