@@ -45,7 +45,7 @@ const MoodboardItem: FC<Props> = ({ moodboards, onClick }) => {
               <React.Fragment key={moodboardIndex}>
                 <div className=" border border-gray-400 rounded-lg">
                   <div className="grid h-fit grid-cols-2 gap-2 bg-white border border-gray-300 rounded-lg m-2 w-fit">
-                    {productItems &&
+                    {productItems.length > 0 &&
                       productItems.map(
                         (item: { image: string }, itemIndex: number) => (
                           <Image
